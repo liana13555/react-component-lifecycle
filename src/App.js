@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import shortid from 'shortid';
 // import ColorPicker from './components/ColorPicker';
-// import Counter from './components/Counter';
 import Container from './components/Container';
 import TodoList from './components/TodoList';
 import TodoEditor from './components/TodoEditor';
@@ -71,6 +70,35 @@ class App extends Component {
     return todos.reduce((total, todo) => (todo.completed ? total + 1 : total), 0);
   };
 
+  componentDidMount() {
+    console.log('App componentDidMount');
+
+    const todos = localStorage.getItem('todos');
+    const parsedTodos = JSON.parse(todos);
+    console.log(parsedTodos);
+
+    if (parsedTodos) {
+      this.setState({ todos: parsedTodos });
+    }
+
+    // setTimeout(() => {
+    //   this.setState({ todos: parsedTodos });
+    // }, 2000);
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    console.log('componentDidUpdate');
+
+    // console.log(prevState);  // До обновления
+    // console.log(this.state);  // После обновления
+
+    if (this.state.todos !== prevState.todos) {
+      console.log('Обновилось поле todos, записываю todos в хранилище');
+
+      localStorage.setItem('todos', JSON.stringify(this.state.todos));
+    }
+  }
+
   render() {
     const { todos, filter } = this.state;
     const totalTodoCount = todos.length;
@@ -110,3 +138,5 @@ export default App;
 //   { label: 'pink', color: '#E91E63' },
 //   { label: 'indigo', color: '#3F51B5' },
 // ];
+
+//this.setState() нельзя вызывать в методе componentDidUpdate() или в render(), тк ог зацикливает компонент, можно только  в componentDidUpdate() по проверке условия - в HTTP запросах
