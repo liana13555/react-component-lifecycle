@@ -2,17 +2,48 @@ import React, { Component } from 'react';
 import shortid from 'shortid';
 // import ColorPicker from './components/ColorPicker';
 import Container from './components/Container';
-import TodoList from './components/TodoList';
-import TodoEditor from './components/TodoEditor';
-import Filter from './components/TodoFilter';
-// import Form from './components/Form';
+// import TodoList from './components/TodoList';
+// import TodoEditor from './components/TodoEditor';
+// import Filter from './components/TodoFilter';
+import Modal from './components/Modal';
+// import Clock from './components/Clock';
 import initialTodos from './todos.json';
 
 class App extends Component {
   state = {
     todos: initialTodos,
     filter: '',
+    showModal: false,
   };
+
+  componentDidMount() {
+    console.log('App componentDidMount');
+
+    const todos = localStorage.getItem('todos');
+    const parsedTodos = JSON.parse(todos);
+    console.log(parsedTodos);
+
+    if (parsedTodos) {
+      this.setState({ todos: parsedTodos });
+    }
+
+    // setTimeout(() => {
+    //   this.setState({ todos: parsedTodos });
+    // }, 2000);
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    console.log('componentDidUpdate');
+
+    // console.log(prevState);  // До обновления
+    // console.log(this.state);  // После обновления
+
+    if (this.state.todos !== prevState.todos) {
+      console.log('Обновилось поле todos, записываю todos в хранилище');
+
+      localStorage.setItem('todos', JSON.stringify(this.state.todos));
+    }
+  }
 
   addTodo = text => {
     const todo = {
@@ -70,46 +101,34 @@ class App extends Component {
     return todos.reduce((total, todo) => (todo.completed ? total + 1 : total), 0);
   };
 
-  componentDidMount() {
-    console.log('App componentDidMount');
-
-    const todos = localStorage.getItem('todos');
-    const parsedTodos = JSON.parse(todos);
-    console.log(parsedTodos);
-
-    if (parsedTodos) {
-      this.setState({ todos: parsedTodos });
-    }
-
-    // setTimeout(() => {
-    //   this.setState({ todos: parsedTodos });
-    // }, 2000);
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    console.log('componentDidUpdate');
-
-    // console.log(prevState);  // До обновления
-    // console.log(this.state);  // После обновления
-
-    if (this.state.todos !== prevState.todos) {
-      console.log('Обновилось поле todos, записываю todos в хранилище');
-
-      localStorage.setItem('todos', JSON.stringify(this.state.todos));
-    }
-  }
+  toggleModal = () => {
+    this.setState(({ showModal }) => ({
+      showModal: !showModal,
+    }));
+  };
 
   render() {
-    const { todos, filter } = this.state;
+    const { todos, filter, showModal } = this.state;
     const totalTodoCount = todos.length;
     const completedTodoCount = this.calculateCompletedTodos();
     const visibleTodos = this.getVisibleTodos();
 
     return (
       <Container>
+        {/* <button type="button" onClick={this.toggleModal}>Показать/скрыть время</button>
+        {showModal &&<Clock />} */}
+
+        {/* <button type="button" onClick={this.toggleModal}>Открыть модалку</button>
+
+        {showModal && (
+          <Modal onClose={this.toggleModal}>
+          <button type="button" onClick={this.toggleModal}>Закрыть модалку</button>
+          </Modal>
+        )} */}
+
         {/* TODO: вынести в отдельный компонент */}
 
-        <div>
+        {/* <div>
           <p>Всего заметок: {totalTodoCount}</p>
           <p>Выполнено: {completedTodoCount}</p>
         </div>
@@ -122,7 +141,7 @@ class App extends Component {
           todos={visibleTodos}
           onDeleteTodo={this.deleteTodo}
           onToggleCompleted={this.toggleCompleted}
-        />
+        /> */}
       </Container>
     );
   }
