@@ -2,12 +2,16 @@ import React, { Component } from 'react';
 import shortid from 'shortid';
 // import ColorPicker from './components/ColorPicker';
 import Container from './components/Container';
-// import TodoList from './components/TodoList';
-// import TodoEditor from './components/TodoEditor';
-// import Filter from './components/TodoFilter';
+import TodoList from './components/TodoList';
+import TodoEditor from './components/TodoEditor';
+import Filter from './components/TodoFilter';
 import Modal from './components/Modal';
+// import Tabs from './components/Tabs/Tabs';
 // import Clock from './components/Clock';
 import initialTodos from './todos.json';
+import IconButton from './components/IconButton';
+// import tabs from './tabs.json';
+import { ReactComponent as AddIcon } from './icons/add.svg';
 
 class App extends Component {
   state = {
@@ -33,15 +37,21 @@ class App extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    console.log('componentDidUpdate');
-
+    // console.log('componentDidUpdate');
     // console.log(prevState);  // До обновления
     // console.log(this.state);  // После обновления
 
-    if (this.state.todos !== prevState.todos) {
+    const nextTodos = this.state.todos;
+    const prevTodos = prevState.todos;
+
+    if (nextTodos !== prevTodos) {
       console.log('Обновилось поле todos, записываю todos в хранилище');
 
-      localStorage.setItem('todos', JSON.stringify(this.state.todos));
+      localStorage.setItem('todos', JSON.stringify(nextTodos));
+    }
+
+    if (nextTodos.length > prevTodos.length && prevTodos.length !== 0) {
+      this.toggleModal();
     }
   }
 
@@ -55,6 +65,8 @@ class App extends Component {
     this.setState(({ todos }) => ({
       todos: [todo, ...todos],
     }));
+
+    // this.toggleModal(); // либо иожно сделать через componentDidUpdate
   };
 
   deleteTodo = todoId => {
@@ -115,6 +127,16 @@ class App extends Component {
 
     return (
       <Container>
+        <IconButton onClick={this.toggleModal} aria-label="Добавить todo">
+          <AddIcon width="40" height="40" fill="#fff" />
+        </IconButton>
+
+        {showModal && (
+          <Modal onClose={this.toggleModal}>
+            <TodoEditor onSubmit={this.addTodo} />
+          </Modal>
+        )}
+        {/* <Tabs items={tabs}/> */}
         {/* <button type="button" onClick={this.toggleModal}>Показать/скрыть время</button>
         {showModal &&<Clock />} */}
 
@@ -128,12 +150,12 @@ class App extends Component {
 
         {/* TODO: вынести в отдельный компонент */}
 
-        {/* <div>
+        <div>
           <p>Всего заметок: {totalTodoCount}</p>
           <p>Выполнено: {completedTodoCount}</p>
         </div>
 
-        <TodoEditor onSubmit={this.addTodo} />
+        {/* <TodoEditor onSubmit={this.addTodo} /> */}
 
         <Filter value={filter} onChange={this.changeFilter} />
 
@@ -141,7 +163,7 @@ class App extends Component {
           todos={visibleTodos}
           onDeleteTodo={this.deleteTodo}
           onToggleCompleted={this.toggleCompleted}
-        /> */}
+        />
       </Container>
     );
   }
